@@ -329,7 +329,32 @@ export function AppProvider({ children }) {
         return;
       }
 
+      case 'RESET_OPENING_BALANCES': {
+        const companyId = state.company.id;
+        if (companyId) {
+          await supabase.from('opening_balances').delete().eq('company_id', companyId);
+        }
+        dispatch({ type: 'SET_OPENING_BALANCES', payload: {} });
+        return;
+      }
+
       case 'RESET_ALL': {
+        const companyId = state.company.id;
+        if (companyId) {
+          // Delete in order: entries → journals → opening_balances → company
+          const { data: journals } = await supabase
+            .from('journals')
+            .select('id')
+            .eq('company_id', companyId);
+          
+          if (journals && journals.length > 0) {
+            const journalIds = journals.map(j => j.id);
+            await supabase.from('journal_entries').delete().in('journal_id', journalIds);
+            await supabase.from('journals').delete().eq('company_id', companyId);
+          }
+          await supabase.from('opening_balances').delete().eq('company_id', companyId);
+          await supabase.from('companies').delete().eq('id', companyId);
+        }
         dispatch(action);
         return;
       }

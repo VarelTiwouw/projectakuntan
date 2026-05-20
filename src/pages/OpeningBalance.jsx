@@ -42,11 +42,13 @@ export default function OpeningBalance() {
   };
 
   const handleReset = () => {
+    if (!window.confirm('Apakah Anda yakin ingin menghapus semua saldo awal?')) return;
     const reset = {};
     state.accounts.forEach(acc => {
       reset[acc.code] = { debit: 0, kredit: 0 };
     });
     setBalances(reset);
+    dispatch({ type: 'RESET_OPENING_BALANCES' });
     setSaved(false);
   };
 
