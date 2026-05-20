@@ -126,8 +126,18 @@ export function AppProvider({ children }) {
       try {
         const company = await loadCompany();
         if (company) {
-          let accounts = await loadAccounts(company.id);
-          if (!accounts) accounts = await seedDefaultAccounts(company.id);
+          let accounts = defaultAccounts;
+          try {
+            const loaded = await loadAccounts(company.id);
+            if (loaded) {
+              accounts = loaded;
+            } else {
+              const seeded = await seedDefaultAccounts(company.id);
+              if (seeded) accounts = seeded;
+            }
+          } catch (err) {
+            console.error('Error loading accounts (using defaults):', err);
+          }
           const [openingBalances, journals] = await Promise.all([loadOpeningBalances(company.id), loadJournals(company.id)]);
           dispatch({ type: 'LOAD_STATE', payload: { company, accounts, openingBalances, journals, isSetupComplete: true } });
         }
@@ -153,15 +163,23 @@ export function AppProvider({ children }) {
       }
       case 'ADD_ACCOUNT': {
         const companyId = state.company.id;
+        let newAccount = { ...action.payload, id: action.payload.id || crypto.randomUUID() };
         if (companyId) {
-          const { data, error } = await supabase.from('accounts').insert({
-            company_id: companyId, code: action.payload.code, name: action.payload.name,
-            type: action.payload.type, category: action.payload.category, normal_balance: action.payload.normalBalance,
-          }).select().single();
-          if (!error && data) {
-            dispatch({ type: 'ADD_ACCOUNT', payload: { id: data.id, code: data.code, name: data.name, type: data.type, category: data.category, normalBalance: data.normal_balance } });
+          try {
+            const { data, error } = await supabase.from('accounts').insert({
+              company_id: companyId, code: action.payload.code, name: action.payload.name,
+              type: action.payload.type, category: action.payload.category, normal_balance: action.payload.normalBalance,
+            }).select().single();
+            if (!error && data) {
+              newAccount = { id: data.id, code: data.code, name: data.name, type: data.type, category: data.category, normalBalance: data.normal_balance };
+            } else if (error) {
+              console.error('Supabase error adding account:', error);
+            }
+          } catch (err) {
+            console.error('Error adding account to Supabase:', err);
           }
         }
+        dispatch({ type: 'ADD_ACCOUNT', payload: newAccount });
         return;
       }
       case 'DELETE_ACCOUNT': {
