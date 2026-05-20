@@ -7,6 +7,8 @@ import JournalEntry from './pages/JournalEntry';
 import BalanceSheet from './pages/BalanceSheet';
 import IncomeStatement from './pages/IncomeStatement';
 import CashFlow from './pages/CashFlow';
+import AccountManagement from './pages/AccountManagement';
+import GeneralLedger from './pages/GeneralLedger';
 
 function LoadingScreen() {
   return (
@@ -59,8 +61,10 @@ function AppRoutes() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Navigate to="/perusahaan" replace />} />
         <Route path="perusahaan" element={<CompanySetup />} />
+        <Route path="akun" element={<AccountManagement />} />
         <Route path="saldo-awal" element={<OpeningBalance />} />
         <Route path="jurnal" element={<JournalEntry />} />
+        <Route path="buku-besar" element={<GeneralLedger />} />
         <Route path="laporan/neraca" element={<BalanceSheet />} />
         <Route path="laporan/laba-rugi" element={<IncomeStatement />} />
         <Route path="laporan/arus-kas" element={<CashFlow />} />

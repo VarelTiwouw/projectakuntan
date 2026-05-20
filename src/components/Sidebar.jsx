@@ -27,6 +27,11 @@ export default function Sidebar() {
           <span>Informasi Perusahaan</span>
         </NavLink>
 
+        <NavLink to="/akun" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+          <span className="icon">📂</span>
+          <span>Daftar Akun</span>
+        </NavLink>
+
         <NavLink to="/saldo-awal" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
           <span className="icon">💰</span>
           <span>Saldo Awal</span>
@@ -35,6 +40,11 @@ export default function Sidebar() {
         <NavLink to="/jurnal" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
           <span className="icon">📝</span>
           <span>Jurnal Umum</span>
+        </NavLink>
+
+        <NavLink to="/buku-besar" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+          <span className="icon">📒</span>
+          <span>Buku Besar</span>
         </NavLink>
 
         <div className="sidebar-section-label">Laporan Keuangan</div>
